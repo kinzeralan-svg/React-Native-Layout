@@ -41,7 +41,13 @@ export default function SettingsScreen() {
     queryClient.setQueryData(["notifications"], updated);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (Platform.OS === "web") {
+      const confirmed = window.confirm("Are you sure you want to log out?");
+      if (!confirmed) return;
+      await logout();
+      return;
+    }
     Alert.alert("Log Out", "Are you sure you want to log out?", [
       { text: "Cancel", style: "cancel" },
       {
