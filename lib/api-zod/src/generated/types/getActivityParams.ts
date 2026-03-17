@@ -5,7 +5,8 @@
  * Wellness Wallet API
  * OpenAPI spec version: 0.1.0
  */
+import type { GetActivityPeriod } from "./getActivityPeriod";
 
-export interface HealthStatus {
-  status: string;
-}
+export type GetActivityParams = {
+  period?: GetActivityPeriod;
+};

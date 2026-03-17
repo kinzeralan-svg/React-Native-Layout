@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  bonusPoints: number;
+  joined: boolean;
 }

@@ -1,22 +1,30 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Wellness Wallet API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: user
+    description: User operations
+  - name: wallet
+    description: Wallet operations
+  - name: activity
+    description: Activity operations
+  - name: rewards
+    description: Rewards operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +32,320 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout user
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /auth/verify-email:
+    post:
+      operationId: verifyEmail
+      tags: [auth]
+      summary: Verify email with code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyEmailRequest"
+      responses:
+        "200":
+          description: Email verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/resend-code:
+    post:
+      operationId: resendCode
+      tags: [auth]
+      summary: Resend verification code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResendCodeRequest"
+      responses:
+        "200":
+          description: Code resent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /user/me:
+    get:
+      operationId: getMe
+      tags: [user]
+      summary: Get current user
+      responses:
+        "200":
+          description: User data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateMe
+      tags: [user]
+      summary: Update current user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /user/setup-wallet:
+    post:
+      operationId: setupWallet
+      tags: [user]
+      summary: Setup wallet goals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetupWalletRequest"
+      responses:
+        "200":
+          description: Wallet setup done
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /wallet:
+    get:
+      operationId: getWallet
+      tags: [wallet]
+      summary: Get wallet info
+      responses:
+        "200":
+          description: Wallet data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Wallet"
+
+  /wallet/withdraw:
+    post:
+      operationId: withdrawFunds
+      tags: [wallet]
+      summary: Withdraw funds
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WithdrawRequest"
+      responses:
+        "200":
+          description: Withdrawal successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Wallet"
+        "400":
+          description: Insufficient funds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /activity:
+    get:
+      operationId: getActivity
+      tags: [activity]
+      summary: Get activity data
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [daily, weekly, monthly]
+      responses:
+        "200":
+          description: Activity data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityData"
+
+  /activity/log:
+    post:
+      operationId: logActivity
+      tags: [activity]
+      summary: Log activity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LogActivityRequest"
+      responses:
+        "200":
+          description: Activity logged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityData"
+
+  /rewards:
+    get:
+      operationId: getRewards
+      tags: [rewards]
+      summary: Get rewards and challenges
+      responses:
+        "200":
+          description: Rewards data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RewardsData"
+
+  /rewards/join-challenge:
+    post:
+      operationId: joinChallenge
+      tags: [rewards]
+      summary: Join a challenge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinChallengeRequest"
+      responses:
+        "200":
+          description: Challenge joined
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /user/notifications:
+    get:
+      operationId: getNotificationSettings
+      tags: [user]
+      summary: Get notification settings
+      responses:
+        "200":
+          description: Notification settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationSettings"
+    put:
+      operationId: updateNotificationSettings
+      tags: [user]
+      summary: Update notification settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationSettings"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationSettings"
+
+  /user/delete:
+    delete:
+      operationId: deleteAccount
+      tags: [user]
+      summary: Delete user account
+      responses:
+        "200":
+          description: Account deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +356,361 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    RegisterRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - firstName
+        - email
+        - password
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    VerifyEmailRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        code:
+          type: string
+      required:
+        - email
+        - code
+
+    ResendCodeRequest:
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+        - email
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        token:
+          type: string
+        needsVerification:
+          type: boolean
+        needsWalletSetup:
+          type: boolean
+      required:
+        - user
+        - token
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        email:
+          type: string
+        emailVerified:
+          type: boolean
+        walletSetupDone:
+          type: boolean
+        plan:
+          type: string
+          enum: [free, premium]
+        avatarUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - firstName
+        - email
+        - emailVerified
+        - walletSetupDone
+        - plan
+        - createdAt
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required: []
+
+    SetupWalletRequest:
+      type: object
+      properties:
+        lockAmount:
+          type: number
+        period:
+          type: string
+          enum: [daily, weekly, monthly]
+        goals:
+          type: array
+          items:
+            type: string
+      required:
+        - lockAmount
+        - period
+        - goals
+
+    Wallet:
+      type: object
+      properties:
+        availableBalance:
+          type: number
+        lockedFunds:
+          type: number
+        unlockedFunds:
+          type: number
+        bonusPoints:
+          type: integer
+        unlockPeriod:
+          type: string
+          enum: [daily, weekly, monthly]
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/WalletTransaction"
+        recentUnlock:
+          type: string
+          nullable: true
+      required:
+        - availableBalance
+        - lockedFunds
+        - unlockedFunds
+        - bonusPoints
+        - unlockPeriod
+        - history
+
+    WalletTransaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        description:
+          type: string
+        amount:
+          type: number
+        type:
+          type: string
+          enum: [unlock, bonus, withdrawal]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - description
+        - amount
+        - type
+        - createdAt
+
+    WithdrawRequest:
+      type: object
+      properties:
+        amount:
+          type: number
+      required:
+        - amount
+
+    ActivityData:
+      type: object
+      properties:
+        steps:
+          type: integer
+        stepsGoal:
+          type: integer
+        minutes:
+          type: integer
+        minutesGoal:
+          type: integer
+        calories:
+          type: integer
+        caloriesGoal:
+          type: integer
+        streakDays:
+          type: integer
+        period:
+          type: string
+          enum: [daily, weekly, monthly]
+        calendarData:
+          type: array
+          items:
+            $ref: "#/components/schemas/CalendarDay"
+        progressAmount:
+          type: number
+        progressGoal:
+          type: number
+      required:
+        - steps
+        - stepsGoal
+        - minutes
+        - minutesGoal
+        - calories
+        - caloriesGoal
+        - streakDays
+        - period
+        - calendarData
+        - progressAmount
+        - progressGoal
+
+    CalendarDay:
+      type: object
+      properties:
+        date:
+          type: string
+        completed:
+          type: boolean
+        amount:
+          type: number
+          nullable: true
+      required:
+        - date
+        - completed
+
+    LogActivityRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [steps, workout, calories]
+        value:
+          type: integer
+      required:
+        - type
+        - value
+
+    RewardsData:
+      type: object
+      properties:
+        dailyGoal:
+          $ref: "#/components/schemas/Challenge"
+        weeklyChallenge:
+          $ref: "#/components/schemas/Challenge"
+        badges:
+          type: array
+          items:
+            $ref: "#/components/schemas/Badge"
+        partnerDiscounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PartnerDiscount"
+      required:
+        - dailyGoal
+        - weeklyChallenge
+        - badges
+        - partnerDiscounts
+
+    Challenge:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        bonusPoints:
+          type: integer
+        joined:
+          type: boolean
+      required:
+        - id
+        - title
+        - description
+        - bonusPoints
+        - joined
+
+    Badge:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        daysCount:
+          type: integer
+        type:
+          type: string
+      required:
+        - id
+        - title
+        - daysCount
+        - type
+
+    PartnerDiscount:
+      type: object
+      properties:
+        id:
+          type: string
+        brand:
+          type: string
+        description:
+          type: string
+        logoIcon:
+          type: string
+      required:
+        - id
+        - brand
+        - description
+        - logoIcon
+
+    JoinChallengeRequest:
+      type: object
+      properties:
+        challengeId:
+          type: string
+      required:
+        - challengeId
+
+    NotificationSettings:
+      type: object
+      properties:
+        activityReminders:
+          type: boolean
+        fundsUnlocked:
+          type: boolean
+        streakUpdates:
+          type: boolean
+      required:
+        - activityReminders
+        - fundsUnlocked
+        - streakUpdates
