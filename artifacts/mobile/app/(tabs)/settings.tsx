@@ -35,7 +35,7 @@ export default function SettingsScreen() {
   });
 
   const toggleNotification = async (key: keyof NotificationSettings) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    try { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); } catch {}
     const updated = { ...notifSettings!, [key]: !notifSettings![key] };
     await apiPut("/user/notifications", updated);
     queryClient.setQueryData(["notifications"], updated);
@@ -47,9 +47,8 @@ export default function SettingsScreen() {
       {
         text: "Log Out", style: "destructive",
         onPress: async () => {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning); } catch {}
           await logout();
-          router.replace("/welcome");
         },
       },
     ]);

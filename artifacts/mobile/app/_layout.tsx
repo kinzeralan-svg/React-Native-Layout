@@ -27,14 +27,18 @@ function RootLayoutNav() {
     if (isLoading) return;
     if (!isAuthenticated) {
       router.replace("/welcome");
-    } else if (!user?.emailVerified) {
-      router.replace({ pathname: "/verify-email", params: { email: user?.email || "" } });
-    } else if (!user?.walletSetupDone) {
-      router.replace("/setup-wallet");
-    } else {
-      router.replace("/(tabs)");
+      return;
     }
-  }, [isLoading, isAuthenticated, user]);
+    if (!user?.emailVerified) {
+      router.replace({ pathname: "/verify-email", params: { email: user?.email || "" } });
+      return;
+    }
+    if (!user?.walletSetupDone) {
+      router.replace("/setup-wallet");
+      return;
+    }
+    router.replace("/(tabs)");
+  }, [isLoading, isAuthenticated, user?.emailVerified, user?.walletSetupDone]);
 
   return (
     <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
