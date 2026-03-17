@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "3oW9GKT8JxcO98zaH3Jeu"
+uri = "file://README.md"
+type = "text"
+title = "README.md — Wellness Wallet"
